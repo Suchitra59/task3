@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>All-in-One Demo</title>
+<style>
+/* =================== GENERAL STYLES =================== */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+}
+header {
+  font-size: 2rem;
+  text-align: center;
+  padding: 1rem;
+  background-color: #007BFF;
+  color: #fff;
+}
+main {
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem;
+}
+.section {
+  flex: 1;
+  margin: 1rem;
+  padding: 1rem;
+  background-color: #f1f1f1;
+  text-align: center;
+  border-radius: 8px;
+}
+h2 {
+  font-size: 1.5rem;
+}
+
+/* =================== RESPONSIVE DESIGN =================== */
+@media (max-width: 600px) {
+  header {
+    font-size: 1.5rem;
+  }
+  main {
+    flex-direction: column;
+  }
+}
+</style>
+</head>
+<body>
+<header>All-in-One Demo</header>
+<main>
+  <!-- Responsive Demo Section -->
+  <div class="section">
+    <h2>Responsive Demo</h2>
+    <p>Try resizing the browser window to see layout adjustments!</p>
+  </div>
+
+  <!-- Interactive Quiz Section -->
+  <div class="section">
+    <h2>Interactive Quiz</h2>
+    <div id="quiz-container"></div>
+    <button id="next">Next</button>
+    <div id="quiz-result"></div>
+  </div>
+
+  <!-- Random Joke Section -->
+  <div class="section">
+    <h2>Random Joke</h2>
+    <div id="joke">Loading joke...</div>
+    <button id="load">Load New Joke</button>
+  </div>
+</main>
+
+<script>
+/* =================== INTERACTIVE QUIZ =================== */
+const questions = [
+  { question: "What is JavaScript?", answers: ["Programming Language", "Fruit", "Animal"], correct: 0 },
+  { question: "What does DOM stand for?", answers: ["Data Oriented Model", "Document Object Model", "Display On Monitor"], correct: 1 },
+  { question: "Which symbol is used to comment in JavaScript?", answers: ["//", "#", "/*...*/"], correct: 0 }
+];
+let current = 0;
+let score = 0;
+
+function loadQuestion() {
+  const container = document.getElementById("quiz-container");
+  const q = questions[current];
+  container.innerHTML = `
+    <h3>${q.question}</h3>
+    ${q.answers.map((a, i) =>
+      `<div><input type="radio" name="answer" value="${i}"> ${a}</div>`).join("")
+    }
+  `;
+}
+loadQuestion();
+
+document.getElementById("next").addEventListener("click", () => {
+  const selected = document.querySelector('input[name="answer"]:checked');
+  if (!selected) {
+    alert("Please select an answer!");
+    return;
+  }
+  if (parseInt(selected.value) === questions[current].correct) {
+    score++;
+  }
+  current++;
+  if (current < questions.length) {
+    loadQuestion();
+  } else {
+    document.getElementById("quiz-container").innerHTML = '';
+    document.getElementById("next").style.display = 'none';
+    document.getElementById("quiz-result").innerText = `Your Score: ${score}/${questions.length}`;
+  }
+});
+
+/* =================== RANDOM JOKE FETCH =================== */
+const jokeEl = document.getElementById("joke");
+const loadBtn = document.getElementById("load");
+
+async function fetchJoke() {
+  const res = await fetch("https://official-joke-api.appspot.com/random_joke");
+  const data = await res.json();
+  jokeEl.innerText = `${data.setup} — ${data.punchline}`;
+}
+loadBtn.addEventListener("click", fetchJoke);
+
+// Load joke when page loads
+fetchJoke();
+</script>
+</body>
+</html>
